@@ -1,5 +1,5 @@
 import 'package:art_directory/providers/user_provider.dart';
-import 'package:art_directory/utils/dimension.dart';
+import 'package:art_directory/utils/global_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
