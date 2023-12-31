@@ -1,8 +1,12 @@
-// ignore_for_file: sort_child_properties_last, use_build_context_synchronously
+// ignore_for_file: sort_child_properties_last, use_build_context_synchronously, prefer_const_constructors
 
 import 'dart:typed_data';
 
 import 'package:art_directory/resources/auth_methods.dart';
+import 'package:art_directory/responsive/mobile_screen_layout.dart';
+import 'package:art_directory/responsive/responsive_layout_screen.dart';
+import 'package:art_directory/responsive/web_screen_layout.dart';
+import 'package:art_directory/screens/login_screen.dart';
 import 'package:art_directory/utils/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -54,12 +58,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
       file: _image!,
     );
 
-    setState(() {
-      _isLoading = true;
-    });
     if (res != 'success') {
+      setState(() {
+      _isLoading = false;
+      });
       showSnackBar(res, context);
+    } else {
+      setState(() {
+      _isLoading = false;
+      });
+      
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(), 
+            mobileScreenLayout: MobileScreenLayout(),
+          )
+        )
+      );
     }
+  }
+
+  void navigateToLogin() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 
   Widget build(BuildContext context) {
@@ -173,9 +195,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   GestureDetector(
+                    onTap: navigateToLogin,
                     child: Container(
                       child: const Text(
-                        "Sign Up.",
+                        "Login.",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       padding: const EdgeInsets.symmetric(

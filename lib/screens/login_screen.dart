@@ -1,6 +1,10 @@
-// ignore_for_file: sort_child_properties_last, use_build_context_synchronously
+// ignore_for_file: sort_child_properties_last, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:art_directory/resources/auth_methods.dart';
+import 'package:art_directory/responsive/mobile_screen_layout.dart';
+import 'package:art_directory/responsive/responsive_layout_screen.dart';
+import 'package:art_directory/responsive/web_screen_layout.dart';
+import 'package:art_directory/screens/signup_screen.dart';
 import 'package:art_directory/utils/utils.dart';
 import 'package:art_directory/widgets/text_field_input.dart';
 import 'package:art_directory/utils/colors.dart';
@@ -34,12 +38,25 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text, password: _passwordController.text);
 
     if (res == "success") {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(), 
+            mobileScreenLayout: MobileScreenLayout(),
+          )
+        )
+      );
     } else {
       showSnackBar(res, context);
     }
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void navigateToSignUp() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => SignUpScreen()));
   }
 
   Widget build(BuildContext context) {
@@ -113,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   GestureDetector(
+                    onTap: navigateToSignUp,
                     child: Container(
                       child: const Text(
                         "Sign Up.",
