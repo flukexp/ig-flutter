@@ -1,3 +1,6 @@
+import 'package:art_directory/resources/auth_methods.dart';
+import 'package:art_directory/resources/firestore_methods.dart';
+import 'package:art_directory/screens/login_screen.dart';
 import 'package:art_directory/utils/colors.dart';
 import 'package:art_directory/utils/utils.dart';
 import 'package:art_directory/widgets/follow_botton.dart';
@@ -114,12 +117,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     FirebaseAuth.instance.currentUser!.uid ==
                                             widget.uid
                                         ? FollowBotton(
-                                            text: 'Edit Profile',
+                                            text: 'Sign Out',
                                             backgroundColor:
                                                 mobileBackgroundColor,
                                             textColor: primaryColor,
                                             borderColor: Colors.grey,
-                                            function: () {},
+                                            function: () async {
+                                              await AuthMethods().signOut();
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const LoginScreen(),
+                                                ),
+                                              );
+                                            },
                                           )
                                         : isFollowing
                                             ? FollowBotton(
@@ -127,14 +139,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 backgroundColor: Colors.white,
                                                 textColor: Colors.black,
                                                 borderColor: Colors.grey,
-                                                function: () {},
+                                                function: () async {
+                                                  await FirestoreMethods()
+                                                      .followUser(
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid,
+                                                    userData['uid'],
+                                                  );
+                                                  setState(() {
+                                                    isFollowing = false;
+                                                    followers--;
+                                                  });
+                                                },
                                               )
                                             : FollowBotton(
                                                 text: 'Follow',
                                                 backgroundColor: Colors.blue,
                                                 textColor: Colors.white,
                                                 borderColor: Colors.blue,
-                                                function: () {},
+                                                function: () async {
+                                                  await FirestoreMethods()
+                                                      .followUser(
+                                                    FirebaseAuth.instance
+                                                        .currentUser!.uid,
+                                                    userData['uid'],
+                                                  );
+                                                  setState(() {
+                                                    isFollowing = true;
+                                                    followers++;
+                                                  });
+                                                },
                                               )
                                   ],
                                 ),
@@ -176,22 +210,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     }
 
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: (snapshot.data! as dynamic).docs.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,crossAxisSpacing: 5,mainAxisSpacing: 1.5, childAspectRatio: 1,), 
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot snap = (snapshot.data! as dynamic).docs[index];
-
-                      return Container(
-                        child: Image(
-                          image: NetworkImage(
-                            snap['postUrl']
-                          ),
-                          fit: BoxFit.cover,
+                    return GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: (snapshot.data! as dynamic).docs.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 1.5,
+                          childAspectRatio: 1,
                         ),
-                      );
-                    });
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot snap =
+                              (snapshot.data! as dynamic).docs[index];
+
+                          return Container(
+                            child: Image(
+                              image: NetworkImage(snap['postUrl']),
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        });
                   },
                 ),
               ],
